@@ -4,10 +4,10 @@ function addTaskEvents() {
 
   for(var i=1;i<dat.length;i++){
     var isActor = new Boolean(false);
-    if(dat[i][1]=="山口" ||dat[i][1]=="策"||dat[i][1]=="はるな" ||dat[i][1]=="わたりょ"||dat[i][1]=="金子" ||dat[i][1]=="あゆむ" ||dat[i][1]=="せいや"||dat[i][1]=="やまねっこ" ||dat[i][1]=="あっきー"||dat[i][1]=="たけ" ){
+    if(dat[i][1]=="やまぐち" ||dat[i][1]=="策"||dat[i][1]=="はるな" ||dat[i][1]=="わたりょ"||dat[i][1]=="あっきー" ||dat[i][1]=="とり" ||dat[i][1]=="せいや"||dat[i][1]=="やまねっこ"){
       isActor = true;
     }
-    if(dat[i][9] == ""){ 
+    if(dat[i][8] == ""){ 
       for(var j=1;j < i; j++){   //まだカレンダーに出力されていない予定に関して変更がないかをチェックする
         iDate = new Date(dat[i][2]);
         jDate = new Date(dat[j][2]);
@@ -22,7 +22,7 @@ function addTaskEvents() {
            var message = (dat[j][1] + "さんが"+ dat[j][2].getMonth() + "月"
                          + dat[j][2].getDate() + "日の予定を『"+dat[j][3]+"』から『"+dat[i][3]+"』に変更しました");
            AnnounceChange(message,dat,j,"pri");
-           dat[j][9]= "うんこ";                         
+           dat[j][8]= "うんこ";                         
         }
       }
       if(dat[i][3] == "時間に制約がある"){
@@ -36,57 +36,25 @@ function addTaskEvents() {
         evtDateF.setHours(absFTime.getHours());
         evtDateF.setMinutes(absFTime.getMinutes());   
          /* イベントの追加・スプレッドシートへの入力 */
-        
-        var repeat = 1;
-        if(dat[i][7] == 2 ||dat[i][7] == 3 || dat[i][7] == 4 ||dat[i][7] == 5 ||dat[i][7] == 6 || dat[i][7] == 7 ||dat[i][7] == 8 ||dat[i][7] == 9 || dat[i][7] == 10){
-          var repeat = dat[i][7];
+        if(isActor == true)//役者or演出ならそれ専用のカレンダーに
+          var myEvt = ActorCal.createEvent(dat[i][1],evtDateS,evtDateF,{description:dat[i][7]}); //カレンダーにタスクをイベントとして追加
+        else{　　//それ以外も専用のカレンダーに
+          var myEvt = BackseatplayerCal.createEvent(dat[i][1],evtDateS,evtDateF,{description:dat[i][7]}); //カレンダーにタスクをイベントとして追加
         }
-        var k = 0;
-        var arrS = (new Array(repeat));
-        var arrF = (new Array(repeat));
-        while(k < repeat){
-          arrS[k] =  evtDateS;
-          arrF[k] =  evtDateF;
-          if(isActor == true)//役者or演出ならそれ専用のカレンダーに
-            var myEvt = ActorCal.createEvent(dat[i][1],arrS[k],arrF[k],{description:dat[i][4]}); //カレンダーにタスクをイベントとして追加
-          else{　　//それ以外も専用のカレンダーに
-            var myEvt = BackseatplayerCal.createEvent(dat[i][1],arrS[k],arrF[k],{description:dat[i][4]}); //カレンダーにタスクをイベントとして追加
-          }
-          Logger.log(evtDateS);
-          evtDateS.setDate(evtDateS.getDate() + 7);
-          evtDateF.setDate(evtDateF.getDate() + 7);
-          k++;
-        }
-        dat[i][9]=myEvt.getId(); //イベントIDを入力
-      }else if (dat[i][3] =="参加できない"){
+        dat[i][8]=myEvt.getId(); //イベントIDを入力
+      }else if (dat[i][3] =="参加できない"){  
         var evtDateSF = new Date(dat[i][2]);
-          var repeat = 1;
-          if(dat[i][7] == 2 ||dat[i][7] == 3 || dat[i][7] == 4 ||dat[i][7] == 5 ||dat[i][7] == 6 || dat[i][7] == 7 ||dat[i][7] == 8 ||dat[i][7] == 9 || dat[i][7] == 10){
-          var repeat = dat[i][7];
+         /* イベントの追加・スプレッドシートへの入力 */
+        if(isActor == true){//役者or演出ならそれ専用のカレンダーに
+          var myEvt = ActorCal.createAllDayEvent(dat[i][1],evtDateSF,{description:dat[i][7]}); //カレンダーにタスクをイベントとして追加                                                                                   
+        }else{　　//それ以外も専用のカレンダーに
+          var myEvt = BackseatplayerCal.createAllDayEvent(dat[i][1],evtDateSF,{description:dat[i][7]}); //カレンダーにタスクをイベントとして追加                                                                                                
         }
-        var k = 0;
-        var arrSF = (new Array(repeat));
-                          Logger.log(k);
-          Logger.log(repeat);
-        while(k < repeat){
-          arrSF[k] = evtDateSF;
-          if(isActor == true){//役者or演出ならそれ専用のカレンダーに
-            var myEvt = ActorCal.createAllDayEvent(dat[i][1],arrSF[k],{description:dat[i][4]}); //カレンダーにタスクをイベントとして追加                                                                                   
-          }else{　　//それ以外も専用のカレンダーに
-            var myEvt = BackseatplayerCal.createAllDayEvent(dat[i][1],arrSF[k],{description:dat[i][4]}); //カレンダーにタスクをイベントとして追加                                                                                                
-          }
-          Logger.log(evtDateSF);
-          evtDateSF.setDate(evtDateSF.getDate() + 7); 
-          k++;
-          Logger.log(k);
-          Logger.log(repeat);
-        }
-        Logger.log("eeee");
-        dat[i][9]=myEvt.getId(); //イベントIDを入力      
+        dat[i][8]=myEvt.getId(); //イベントIDを入力      
       }
     }
-  }    
-  AnswerSheet.getRange(1,1,i,10).setValues(dat); //データをシートに出力
+  }
+  AnswerSheet.getRange(1,1,i,9).setValues(dat); //データをシートに出力
 }
 
 /* 指定月のカレンダーからイベントを取得する */
@@ -172,29 +140,10 @@ function AnnounceChange(message,dat,j){
   var twoWeeksLater = new Date(); 
   twoWeeksLater.setDate(twoWeeksLater.getDate() + 14);//二週間後
   if(now < dat[j][2] &&  twoWeeksLater > dat[j][2] ){　//個人の予定で変更されたのが二週間以内の予定だった場合
-    sendHttpPost(message, username,postUrlA); //slackで通知
+    sendHttpPost(message, username,postUrl); //slackで通知
   }
   if(twoWeeksLater > dat[j][2] ){　//稽古予定で変更されたのが二週間以内の予定だった場合 //now < dat[j][2]
-    sendHttpPost(message, username,postUrlA); //slackで通知
+    sendHttpPost(message, username,postUrl); //slackで通知
     Logger.log("333");
   }
-}
-
-
-/* 指定月のカレンダーからイベントを取得する */
-function addDeadline() {
-  var dat = DeadSheet.getDataRange().getValues(); //シートデータを取得
-  for(var i=1;i<dat.length;i++){
-    if(dat[i][4] == ""){
-      /* 日時をセット */
-      var evtDateSF = new Date(dat[i][2]);  
-      /* イベントタイトルを設定*/
-      var title = dat[i][1] + ":" + dat[i][3];
-      /* イベントの追加・スプレッドシートへの入力 */
-      var myEvt = PracticeCal.createAllDayEvent(title,evtDateSF,{description:dat[i][1]}); //カレンダーにタスクをイベントとして追加    
- 
-      dat[i][4]=myEvt.getId(); //イベントIDを入力
-    }
-  }
-  DeadSheet.getRange(1,1,i,5).setValues(dat); //データをシートに出力
 }

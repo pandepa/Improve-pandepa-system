@@ -1,31 +1,18 @@
-var ActorCal = CalendarApp.getCalendarById('b8pd4kib7k4ilcf3atosuhbu5o@group.calendar.google.com');//イベントカレンダーを取得
-var BackseatplayerCal = CalendarApp.getCalendarById('7c9gfdvacreauvddo7eujld3do@group.calendar.google.com');
-var PracticeCal = CalendarApp.getCalendarById('9ocjo1bhkote67fd471l6cg8hc@group.calendar.google.com');
-var spSheet = SpreadsheetApp.openById('1YJfJ0vZBOZudS9yJdtYt103MfPa7FFqLjPZPPN3U71A');//スプレッドシートを取得
 
 
-/*各シートを取得*/
-var Sche = spSheet.getSheetByName("Schedule");
-var classSche = spSheet.getSheetByName("classSche");
-var EvtSheet = spSheet.getSheetByName("EvtSheet");
-var ActorSche = spSheet.getSheetByName("ActorSche");
-var WhoIsAbsentTomorrow = spSheet.getSheetByName("WhoIsAbsentTomorrow");
-var AnswerSheet = spSheet.getSheetByName("Answer"); //シートを取得
-var PracticeSheet = spSheet.getSheetByName("PracticeDay");
-var DeadSheet = spSheet.getSheetByName("Dead"); //シートを取得
-
-var postUrlA = "https://hooks.slack.com/services/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";  //slackのreminder Webhook URL
-var postUrlB = "https://hooks.slack.com/services/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";  //slavkの通知チーム　Webhooks
-var postChannel = "#reminder";  //ポストするスラックのチャンネル
-var username = "教えてくれるパンダ";  //slackでリマインドするbotの表示名
-
-
-//sheet2の時間割をカレンダーに反映したい！
-function checkAndWriteCalender() {
+var Cal_Sheet = function (name){
+  this.name = name;
+  this.sheet = spSheet.getSheetByName(name);
+  
+  if (name == "Practice") this.cal = PracticeCal; 
+  else if (name == "Actor") this.cal = ActorCal; 
+  else this.cal = null;
 }
 
+
+
 //カレンダー上の稽古日程をシートに保存したい！
-function saveEventCalenderToSheet() {
+function P_saveEventCalenderToSheet() {
     EvtSheet.getRange('2:100').clear();//実行の都度、初期化をする
     var dat = EvtSheet.getDataRange().getValues();//シートのデータを配列に取得  
     var today = new Date();//今日の日付  
@@ -54,7 +41,7 @@ function saveEventCalenderToSheet() {
 }
 
 //稽古日程をslackにmentionしたい！
-function slackMentionByEvtSheet() {
+function P_slackMentionByEvtSheet() {
     saveEventCalenderToSheet();
     var dat = EvtSheet.getDataRange().getValues();//イベントシートのデータを配列に取得
     var today = new Date();//今日の日付
@@ -69,7 +56,7 @@ function slackMentionByEvtSheet() {
               }
                 //  var message ="ごめんね";
               Logger.log(message);
-              sendHttpPost(message,username,postUrlA);
+              sendHttpPost(message,username,postUrl);
             
             }
         }
@@ -78,7 +65,7 @@ function slackMentionByEvtSheet() {
 
 
 //messageを生成
-function generateMessage(dat, i,sDate,what) {
+function P_generateMessage(dat,i,sDate,what) {
   var sTime = new Date(dat[i][4]);//シート上の稽古開始時間を取得
   var fTime = new Date(dat[i][7]);//シート上の稽古終了時間を取得
   var sMinutes = (sTime.getMinutes());
@@ -97,10 +84,11 @@ function generateMessage(dat, i,sDate,what) {
                         + sTime.getHours() + ":" + sMinutes + "～"
                         + fTime.getHours() + ":" + fMinutes + "で、場所は"
                         + dat[i][8] + "です！");
-    if(tomorabs.length != 1){ 
-         var absmessage = " ";
+   
+   if(tomorabs.length != 1){         
+        var absmessage = " ";             
          for(var x = 0;x < tomorabs.length-1; x++){
-            var absSTime = tomorabs[x+1][1];
+         　　var absSTime = tomorabs[x+1][1];
             var absFTime = tomorabs[x+1][2];
             if(absSTime != "稽古開始"){
                var absSMinutes = (absSTime.getMinutes());
@@ -110,7 +98,8 @@ function generateMessage(dat, i,sDate,what) {
             }
             if (absSMinutes< 10 ){ absSMinutes = "0" + absSMinutes; }//一桁なら頭に0をつける
             if (absFMinutes < 10 ) { absFMinutes = "0" + absFMinutes; }
-            if(absSTime == "稽古開始" && absFTime != "稽古終了" ){
+           
+           if(absSTime == "稽古開始" && absFTime != "稽古終了" ){
                absmessage += ( tomorabs[x+1][0] + "さんは"　+ absSTime +  "～"　+ absFTime.getHours() + ":"+ absFMinutes +"まで");
             }else if(absSTime != "稽古開始" && absFTime == "稽古終了"){
                absmessage += ( tomorabs[x+1][0] + "さんは"　+ absSTime.getHours() + ":" + absSMinutes
@@ -157,11 +146,11 @@ function sendHttpPost(message, username,postUrl) {
             "contentType": "application/json",
             "payload": payload
         };
-   UrlFetchApp.fetch(postUrl, options);
+    UrlFetchApp.fetch(postUrl, options);
 }
 
 //欠席関連の管理。個人カレンダーの内容をシートに反映
-function savePrivateCalendarToSheet() {　　　　　　 //欠席・遅刻・早退の管理
+function P_savePrivateCalendarToSheet() {　　　　　　 //欠席・遅刻・早退の管理
     ActorSche.getRange('2:100').clear();　　　　　//実行の都度、初期化をする
     var absent = ActorSche.getDataRange().getValues();　　//シートのデータを配列に取得  
     var today = new Date();//今日の日付  
@@ -188,10 +177,11 @@ function savePrivateCalendarToSheet() {　　　　　　 //欠席・遅刻・�
     }
     ActorSche.getRange(1, 1, i, 8).setValues(absent);
 }
+
 // 稽古日程と個人の欠席の判定
 function WhoIsAbsent(dat, i) {
     WhoIsAbsentTomorrow.getRange('2:100').clear();　　　　　//実行の都度、初期化をする
-    var absent = ActorSche.getDataRange().getValues();//個人シートのデータを配列に取得
+    var absent = Actor.getDataRange().getValues();//個人シートのデータを配列に取得
     var nextPracticeDay = new Date(); 
     nextPracticeDay.setDate(nextPracticeDay.getDate() + 1);  //（＊前の関数より明日が稽古である前提）24時間後の日付を取得
   
