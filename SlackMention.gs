@@ -49,6 +49,6 @@ function sendHttpPost(Envelope) {
             "contentType": "application/json",
             "payload": payload
         };
-    UrlFetchApp.fetch(Envelope.url, options);
+    UrlFetchApp.fetch(Envelope.url,options);
 }
 
