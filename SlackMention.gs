@@ -34,12 +34,12 @@ function genAbsentMessage(dat,i) {
 }
 
 //slackにポストする関数
-function sendHttpPost(Envelope) {
+function sendHttpPost(envelope) {
     var jsonData =
         {
-            "channel": Envelope.channel,
-            "username": Envelope.username,
-            "text": Envelope.message,
+            "channel": envelope.channel,
+            "username": envelope.username,
+            "text": envelope.message,
             "icon_url": "https://slack.com/img/icons/panda.jpg"
         };
     var payload = JSON.stringify(jsonData);
@@ -49,6 +49,6 @@ function sendHttpPost(Envelope) {
             "contentType": "application/json",
             "payload": payload
         };
-    UrlFetchApp.fetch(Envelope.url,options);
+    UrlFetchApp.fetch(envelope.url,options);
 }
 
