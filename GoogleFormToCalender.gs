@@ -21,7 +21,7 @@ function addTaskEvents() {
           Logger.log("1234500");
            var message = (dat[j][1] + "さんが"+ dat[j][2].getMonth() + "月"
                          + dat[j][2].getDate() + "日の予定を『"+dat[j][3]+"』から『"+dat[i][3]+"』に変更しました");
-           AnnounceChange(message,dat,j,"pri");
+           AnnounceChange(message,dat,j);
            dat[j][9]= "うんこ";                         
         }
       }
@@ -42,15 +42,11 @@ function addTaskEvents() {
           var repeat = dat[i][7];
         }
         var k = 0;
-        var arrS = (new Array(repeat));
-        var arrF = (new Array(repeat));
         while(k < repeat){
-          arrS[k] =  evtDateS;
-          arrF[k] =  evtDateF;
           if(isActor == true)//役者or演出ならそれ専用のカレンダーに
-            var myEvt = ActorCal.createEvent(dat[i][1],arrS[k],arrF[k],{description:dat[i][4]}); //カレンダーにタスクをイベントとして追加
+            var myEvt = ActorCal.createEvent(dat[i][1],evtDateS,evtDateF,{description:dat[i][4]}); //カレンダーにタスクをイベントとして追加
           else{　　//それ以外も専用のカレンダーに
-            var myEvt = BackseatplayerCal.createEvent(dat[i][1],arrS[k],arrF[k],{description:dat[i][4]}); //カレンダーにタスクをイベントとして追加
+            var myEvt = BackseatplayerCal.createEvent(dat[i][1],evtDateS,evtDateF,{description:dat[i][4]}); //カレンダーにタスクをイベントとして追加
           }
           Logger.log(evtDateS);
           evtDateS.setDate(evtDateS.getDate() + 7);
@@ -65,15 +61,11 @@ function addTaskEvents() {
           var repeat = dat[i][7];
         }
         var k = 0;
-        var arrSF = (new Array(repeat));
-                          Logger.log(k);
-          Logger.log(repeat);
         while(k < repeat){
-          arrSF[k] = evtDateSF;
           if(isActor == true){//役者or演出ならそれ専用のカレンダーに
-            var myEvt = ActorCal.createAllDayEvent(dat[i][1],arrSF[k],{description:dat[i][4]}); //カレンダーにタスクをイベントとして追加                                                                                   
+            var myEvt = ActorCal.createAllDayEvent(dat[i][1],evtDateSF,{description:dat[i][4]}); //カレンダーにタスクをイベントとして追加                                                                                   
           }else{　　//それ以外も専用のカレンダーに
-            var myEvt = BackseatplayerCal.createAllDayEvent(dat[i][1],arrSF[k],{description:dat[i][4]}); //カレンダーにタスクをイベントとして追加                                                                                                
+            var myEvt = BackseatplayerCal.createAllDayEvent(dat[i][1],evtDateSF,{description:dat[i][4]}); //カレンダーにタスクをイベントとして追加                                                                                                
           }
           Logger.log(evtDateSF);
           evtDateSF.setDate(evtDateSF.getDate() + 7); 
@@ -90,7 +82,7 @@ function addTaskEvents() {
 }
 
 /* 指定月のカレンダーからイベントを取得する */
-function addTaskEventsForBunkan() {
+function addTaskEventsForBukan() {
   var dat = PracticeSheet.getDataRange().getValues(); //シートデータを取得
   for(var i=1;i<dat.length;i++){
     if(dat[i][7] == ""){
@@ -98,7 +90,7 @@ function addTaskEventsForBunkan() {
         iDate = new Date(dat[i][2]);
         jDate = new Date(dat[j][2]);
         if(dat[i][1] == dat[j][1] && iDate.getDate() == jDate.getDate()){//元の予定と日付と名前が一緒の場合
-             deleteEve(dat,j,i,PracticeCal,"Prac");
+             deleteEve(dat,j,i,EventCal,"Prac");
         }
       }
       /* 日時をセット */
@@ -112,11 +104,12 @@ function addTaskEventsForBunkan() {
       evtDateF.setMinutes(evtFTime.getMinutes());    
  
       /* イベントの追加・スプレッドシートへの入力 */
-      var myEvt = PracticeCal.createEvent(dat[i][1],evtDateS,evtDateF,{location:dat[i][5],description:dat[i][6]});
+      var myEvt = EventCal.createEvent(dat[i][1],evtDateS,evtDateF,{location:dat[i][5],description:dat[i][6]});
  
       dat[i][7]=myEvt.getId(); //イベントIDを入力
     }
   }
+  Logger.log(i);
   PracticeSheet.getRange(1,1,i,8).setValues(dat); //データをシートに出力
 }
 
@@ -171,12 +164,13 @@ function AnnounceChange(message,dat,j){
   var now = new Date(); //再定義
   var twoWeeksLater = new Date(); 
   twoWeeksLater.setDate(twoWeeksLater.getDate() + 14);//二週間後
-  Envelope.message = message;
+  var envelope = new Envelope;
+  envelope.message = message;
   if(now < dat[j][2] &&  twoWeeksLater > dat[j][2] ){　//個人の予定で変更されたのが二週間以内の予定だった場合
-    sendHttpPost(Envelope); //slackで通知
+    sendHttpPost(envelope); //slackで通知
   }
   if(twoWeeksLater > dat[j][2] ){　//稽古予定で変更されたのが二週間以内の予定だった場合 //now < dat[j][2]
-    sendHttpPost(Envelope);; //slackで通知
+    sendHttpPost(envelope); //slackで通知
     Logger.log("333");
   }
 }
@@ -198,4 +192,16 @@ function addDeadline() {
     }
   }
   DeadSheet.getRange(1,1,i,5).setValues(dat); //データをシートに出力
+}
+
+function DebugDelete() {
+  var del = new Date(2018,9,22,0,0,0); 
+  var events = ActorCal.getEventsForDay(del);
+  Logger.log(del);
+  for(var n=0; n<events.length; n++){
+    if(events[n].getTitle() == "あゆむ"){
+      Logger.log(events[n].getTitle());
+      events[n].deleteEvent()
+    }
+  }
 }
