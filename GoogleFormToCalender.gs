@@ -83,7 +83,7 @@ function addTaskEvents() {
 
 /* 指定月のカレンダーからイベントを取得する */
 function addTaskEventsForBukan() {
-  var dat = Event.getDataRange().getValues(); //シートデータを取得
+  var dat = PracticeSheet.getDataRange().getValues(); //シートデータを取得
   for(var i=1;i<dat.length;i++){
     if(dat[i][7] == ""){
       for(var j=1;j < i; j++){   //まだカレンダーに出力されていない予定に関して変更がないかをチェックする
@@ -109,7 +109,8 @@ function addTaskEventsForBukan() {
       dat[i][7]=myEvt.getId(); //イベントIDを入力
     }
   }
-  Event.getRange(1,1,i,8).setValues(dat); //データをシートに出力
+  Logger.log(i);
+  PracticeSheet.getRange(1,1,i,8).setValues(dat); //データをシートに出力
 }
 
 function deleteEve(dat,j,i,cals,whichDoseChange) { 
