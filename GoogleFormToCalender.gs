@@ -1,5 +1,5 @@
 /* 指定月のカレンダーからイベントを取得する */
-function addTaskEvents() {
+function PaddTaskEvents() {
   var dat = AnswerSheet.getDataRange().getValues(); //シートデータを取得
 
   for(var i=1;i<dat.length;i++){
@@ -83,7 +83,7 @@ function addTaskEvents() {
 
 /* 指定月のカレンダーからイベントを取得する */
 function addTaskEventsForBukan() {
-  var dat = Event.getDataRange().getValues(); //シートデータを取得
+  var dat = PracticeSheet.getDataRange().getValues(); //シートデータを取得
   for(var i=1;i<dat.length;i++){
     if(dat[i][7] == ""){
       for(var j=1;j < i; j++){   //まだカレンダーに出力されていない予定に関して変更がないかをチェックする
@@ -109,7 +109,8 @@ function addTaskEventsForBukan() {
       dat[i][7]=myEvt.getId(); //イベントIDを入力
     }
   }
-  Event.getRange(1,1,i,8).setValues(dat); //データをシートに出力
+  Logger.log(i);
+  PracticeSheet.getRange(1,1,i,8).setValues(dat); //データをシートに出力
 }
 
 function deleteEve(dat,j,i,cals,whichDoseChange) { 
@@ -163,13 +164,13 @@ function AnnounceChange(message,dat,j){
   var now = new Date(); //再定義
   var twoWeeksLater = new Date(); 
   twoWeeksLater.setDate(twoWeeksLater.getDate() + 14);//二週間後
-  var envelope = new Envelope();
+  var envelope = new Envelope;
   envelope.message = message;
   if(now < dat[j][2] &&  twoWeeksLater > dat[j][2] ){　//個人の予定で変更されたのが二週間以内の予定だった場合
-    sendHttpPost(Envelope); //slackで通知
+    sendHttpPost(envelope); //slackで通知
   }
   if(twoWeeksLater > dat[j][2] ){　//稽古予定で変更されたのが二週間以内の予定だった場合 //now < dat[j][2]
-    sendHttpPost(Envelope); //slackで通知
+    sendHttpPost(envelope); //slackで通知
     Logger.log("333");
   }
 }
