@@ -24,7 +24,7 @@ function checkDuplicationAndAddEvent(dat,i,status){
     id_column = 7;
     calender = EventCal;
   }
-
+  
   /* 
   過去を検索　→　過去のデータは全てcheckされている前提
   過去回答のうち最新のものをチェック
@@ -51,7 +51,7 @@ function checkDuplicationAndAddEvent(dat,i,status){
       i = j;//iを最新の予定の行数とする
     }  
   }
-    
+  
   /* 未来検索で得た最新のiについて、statusに対応するcalenderに反映*/
   if(status == 0){
     checkAttendance(dat,i,calender);
@@ -62,28 +62,28 @@ function checkDuplicationAndAddEvent(dat,i,status){
   }
   
   if(past_j) announceChange(dat,i,past_j,status);
- return dat;  
+  return dat;  
 }
 
 
 /* 未来検索により取得した最新の参加予定の回答について、イベントをカレンダーに追加 */
 function checkAttendance(dat,i,calender){
   if(dat[i][3] == "参加できる"){
-  dat[i][9] = "checked";
+    dat[i][9] = "checked";
   } else { //参加できないor時間に制約がある
     var repeat = 1;
     if(dat[i][7]) repeat = dat[i][7];
     var rec = CalendarApp.newRecurrence().addWeeklyRule().times(repeat);
-        
+    
     if(dat[i][3] == "参加できない"){
       var eventSeries = calender.createAllDayEventSeries(dat[i][1],new Date(dat[i][2]),rec,
-                                                        {description : dat[i][4]});                                                    
+                                                         {description : dat[i][4]});                                                    
       dat[i][9] = eventSeries.getId();
     } else {//時間に制約がある
       if(dat[i][5]<dat[i][6]){//時間の前後関係が狂ってなければ
         var dateArray = setSFDate(dat[i][2],dat[i][5],dat[i][6]);//開始時間と終了時間をdate型にし、配列に取得
         var eventSeries = calender.cleateEventSeries(dat[i][1],dateArray[0],dateArray[1],rec,
-                                                   {description : dat[i][4]});
+                                                     {description : dat[i][4]});
         dat[i][9] = eventSeries.getId();
       } else {
         dat[i][9] = "checked";
@@ -94,10 +94,10 @@ function checkAttendance(dat,i,calender){
 }
 
 /* 
-   日時を比較して、二週間以内なら、statusに沿ってmessageを作る関数を呼びsendHttpPost
-　　　　　　statusは定数
-   0→出席変更
-　　　　　　1→稽古予定変更
+日時を比較して、二週間以内なら、statusに沿ってmessageを作る関数を呼びsendHttpPost
+statusは定数
+0→出席変更
+1→稽古予定変更
 */
 function announceChenge(dat,i,j,status){
   var twoWeeksLater = new Date();

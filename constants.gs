@@ -14,7 +14,6 @@ var spSheet = SpreadsheetApp.openById(sheetID);
 /*各シートを取得*/
 var Event = spSheet.getSheetByName("Event");
 var Actor = spSheet.getSheetByName("Actor");
-var WhoIsAbsentTomorrow = spSheet.getSheetByName("WhoIsAbsentTomorrow");
 var AnswerSheet = spSheet.getSheetByName("Answer"); 
 var PracticeSheet = spSheet.getSheetByName("PracticeDay");
 var DeadSheet = spSheet.getSheetByName("Dead");
@@ -52,18 +51,18 @@ function formTime(date) {//Utilities.formatDate(date, timeZone, format)はDate�
 }
 
 function zeroPadding(num,length){//numがlengthの長さになるように頭に0を入れる関数 「0埋め js」とかでググろう
-    return ('0000000000' + num).slice(-length);
+  return ('0000000000' + num).slice(-length);
 }
 
 /* 
 typeに"Date"などの型名を指定し、objにオブジェクトを渡すと、型が一致ならtrue、不一致ならfalseを返す
 例: var now = new Date();
-    is("String",now)//false
-    is("Date",now)//true
+is("String",now)//false
+is("Date",now)//true
 */
 function is(type, obj) {
-    var clas = Object.prototype.toString.call(obj).slice(8, -1);
-    return obj !== undefined && obj !== null && clas === type;
+  var clas = Object.prototype.toString.call(obj).slice(8, -1);
+  return obj !== undefined && obj !== null && clas === type;
 }
 
 
@@ -77,7 +76,7 @@ function isActor(name){//役者などのSystemConstantsシートE列に登録し
   for(var i=1;i<　systemDat.length;i++){
     if(name == systemDat[i][4]) return true;
   }
-   return false; 
+  return false; 
 }
 
 function datesEqual(date1,date2){//日付（月日）が等価ならtrueを返す
@@ -103,7 +102,7 @@ function DebugDelete() {
   var events = ActorCal.getEventsForDay(del);
   Logger.log(del);
   for(var n=0; n<events.length; n++){
-    if(events[n].getTitle() == "あゆむ"){
+    if(events[n].getTitle() == "name"){
       Logger.log(events[n].getTitle());
       events[n].deleteEvent()
     }
