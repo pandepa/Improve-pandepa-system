@@ -19,7 +19,6 @@ function checkDuplicationAndAddEvent(dat,i,status){
       var calender = ActorCal;
     } else {//裏方ならば
       var calender = BackseatplayerCal;  
-
     }
   } else if (status == 1){
     id_column = 7;
