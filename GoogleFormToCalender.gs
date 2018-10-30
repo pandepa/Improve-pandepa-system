@@ -67,6 +67,7 @@ function checkDuplicationAndAddEvent(dat,i,status){
     }
   }
   
+  
   if(past_j) announceChange(dat,i,past_j,status);
   return dat;  
 }
