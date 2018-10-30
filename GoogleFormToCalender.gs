@@ -32,14 +32,16 @@ function checkDuplicationAndAddEvent(dat,i,status){
   for(var j=i-1;j>0;j--){
     Logger.log(j);
     if(dat[j][1] == dat[i][1] && datesEqual(dat[j][2],dat[i][2])){//同一人物or稽古かつ同日の予定なら
-      if(dat[j][id_column] == "checked") {
-        past_j = j;//announceChanege用にjを保持
-        j = 0;//変更の必要がないため終了
-      } else { 
-        var evt = calender.getEventById(dat[j][id_column]);//過去のカレンダーイベントを削除
+      past_j = j;//イベント削除及びannounceChanege用にjを保持
+      j = 0;//終了
+      
+      /* 過去検索で得たpast_jについて削除処理 */
+      if(!(dat[past_j][id_column] == "checked" || dat[past_j][id_column] == "deleated")){//IDの列が特定文字列ではないならば
+        var evt = calender.getEventById(dat[past_j][id_column]);//過去のカレンダーイベントを削除
         evt.deleteEvent();
-        past_j = j;//announceChanege用にjを保持
-        j = 0;//終了
+        /* イベント削除後にエラーが起こった場合、削除済みのイベントを削除できずエラーが誘発するため、即時に削除済みにデータ変更します */
+        AnswerSheet.getRange(past_j + 1,id_column + 1).setValue("deleated");
+        dat[past_j][id_column] = "deleated";
       }
     }
   }
@@ -52,14 +54,15 @@ function checkDuplicationAndAddEvent(dat,i,status){
     }  
   }
   
-  /* 未来検索で得た最新のiについて、statusに対応するcalenderに反映*/
+  /* 未来検索で得た最新のiについて、statusに対応する処理をしcalenderに反映*/
   if(status == 0){
     checkAttendance(dat,i,calender);
   } else if (status == 1) {           
     var dateArray = setSFDate(dat[i][2],dat[i][3],dat[i][4]);//開始時間と終了時間を配列に取得
-    var evt = 　EventCal.createEvent(dat[i][1],dateArray[0],dateArray[1],{location:PracticeDat[i][5],description:PracticeDat[i][6]});
+    var evt = 　EventCal.createEvent(dat[i][1],dateArray[0],dateArray[1],{location:dat[i][5],description:dat[i][6]});
     dat[i][7]=evt.getId(); //イベントIDを入力 
   }
+  
   
   if(past_j) announceChange(dat,i,past_j,status);
   return dat;  
@@ -82,7 +85,7 @@ function checkAttendance(dat,i,calender){
     } else {//時間に制約がある
       if(dat[i][5]<dat[i][6]){//時間の前後関係が狂ってなければ
         var dateArray = setSFDate(dat[i][2],dat[i][5],dat[i][6]);//開始時間と終了時間をdate型にし、配列に取得
-        var eventSeries = calender.cleateEventSeries(dat[i][1],dateArray[0],dateArray[1],rec,
+        var eventSeries = calender.createEventSeries(dat[i][1],dateArray[0],dateArray[1],rec,
                                                      {description : dat[i][4]});
         dat[i][9] = eventSeries.getId();
       } else {
@@ -99,7 +102,7 @@ statusは定数
 0→出席変更
 1→稽古予定変更
 */
-function announceChenge(dat,i,j,status){
+function announceChange(dat,i,j,status){
   var twoWeeksLater = new Date();
   twoWeeksLater.setDate(twoWeeksLater.getDate() + 14);//二週間後
   
