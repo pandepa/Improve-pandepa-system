@@ -20,7 +20,7 @@ function slackMentionByEvtSheet() {
 /* 個人予定の回答シートから、回答をカレンダーに反映 */
 function addTaskEvents(){
   var ansDat = AnswerSheet.getDataRange().getValues(); //シートデータを取得
-  var i = 0 + systemDat[6][0];//チェック済みの行数をロード
+  var i = 0 + systemDat[1][6];//チェック済みの行数をロード
   
   for(;i<ansDat.length;i++){
     if(!ansDat[i][9]){//未チェックの回答ならば
@@ -28,7 +28,7 @@ function addTaskEvents(){
     }
   }
   AnswerSheet.getRange(1, 1, i, 10).setValues(ansDat);
-  ConstantsSheet.getRange("A7").setValue(i);//チェック済みの行数をセーブ
+  ConstantsSheet.getRange("G2").setValue(i);//チェック済みの行数をセーブ
 }
 
 
