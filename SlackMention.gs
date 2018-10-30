@@ -6,7 +6,7 @@ function genBasisMessage(dat,i){
     formTime(new Date(dat[i][4])) + "〜" + formTime(new Date(dat[i][7])) +
       "で、場所は" + dat[i][8] +"です！よろしく！");
   
-  if(dat[i][9]) message += "\n備考："+ dat[i][9]; 
+  if(dat[i][9] != "nothing") message += "\n備考："+ dat[i][9]; 
   return message;
 }
 
@@ -14,6 +14,8 @@ function genBasisMessage(dat,i){
 function genAbsentMessage(dat,i) {
   saveCalenderToSheet("Actor");
   
+  var tomorrow = new Date()
+  tomorrow.setDate(tomorrow.getDate()+1);//明日の日付
   var actorDat = Actor.getDataRange().getValues();
   var pracArray = setSFDate(dat[i][2],dat[i][4],dat[i][7]);//イベントカレンダー用シートより、稽古の開始、終了時間を配列に取得
   var tomorrowAbs = [];
@@ -21,8 +23,7 @@ function genAbsentMessage(dat,i) {
   
   for(var j = 0; j < actorDat.length;j++){
     var absArray = setSFDate(actorDat[j][2],actorDat[j][4],actorDat[j][7]);//役者演出カレンダー用シートより、欠席の開始、終了時間を配列に取得
-    
-    if (datesEqual(tomorrow,absDate)) {//同じ日付ならば
+    if (datesEqual(tomorrow,new Date(actorDat[j][2]))) {//同じ日付ならば
       if (absArray[0] < pracArray[1] && pracArray[0] < absArray[1]){//欠席終了が稽古開始時間より前、欠席開始が稽古終了時間より後である場合を除きます
         tomorrowAbs[counter] = [];
         tomorrowAbs[counter][0] = actorDat[j][1];                       
@@ -36,17 +37,16 @@ function genAbsentMessage(dat,i) {
         } else {
           tomorrowAbs[counter][2] = actorDat[j][7];
         }
-        j++;
+        counter++;
       }
     }
   }
-  
-  if(tomorrowAbs){         
+  Logger.log(tomorrowAbs);
+  if(tomorrowAbs){       
     var absMessage = "";             
-    for(var j = 1;j < tomorrowAbs.length;j++){  
+    for(var j = 0;j < tomorrowAbs.length;j++){  
       absSTime = tomorrowAbs[j][1];
       absFTime = tomorrowAbs[j][2];
-      
       if(absSTime != "稽古開始") var absSTime = formTime(new Date(tomorrowAbs[j][1]));
       if(absFTime != "稽古終了") var absFTime = formTime(new Date(tomorrowAbs[j][2]));
       absMessage += (tomorrowAbs[j][0] + "さんは" + absSTime + "～" + absFTime + "まで\n");
@@ -67,7 +67,7 @@ function genAttendanceChanegeMessage(dat,i,j){
 }
 
 function genPracticeChangeMessage(dat,i,j){
-  var addmessage = null;      
+  var addmessage = "";      
   if(dat[i][4] == "") addmessage = "なしに";
   
   var message = (dat[j][2].getMonth() + "月"
@@ -91,6 +91,7 @@ function sendHttpPost(envelope) {
         "contentType": "application/json",
         "payload": payload
       };
-  UrlFetchApp.fetch(envelope.url,options);
+  //UrlFetchApp.fetch(envelope.url,options);
+  Logger.log(envelope.message);
 }
 

@@ -88,6 +88,9 @@ function setSFDate(date,start,finish){//開始時間と終了時間のStringを�
   var fDate = new Date(date);
   var sTime = new Date(start);
   var fTime = new Date(finish);
+  if(fTime.getHours() == 0 && fTime.getMinutes() == 0){//終了時間が0時の時、gas上では日付を跨いだ扱いにならないため、手動で+1
+    fDate.setDate(fDate.getDate()+1);
+  }
   sDate.setHours(sTime.getHours());
   sDate.setMinutes(sTime.getMinutes());     
   fDate.setHours(fTime.getHours());
