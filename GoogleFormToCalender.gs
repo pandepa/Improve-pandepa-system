@@ -57,16 +57,19 @@ function checkDuplicationAndAddEvent(dat,i,status){
   /* 未来検索で得た最新のiについて、statusに対応する処理をしcalenderに反映*/
   if(status == 0){
     checkAttendance(dat,i,calender);
-  } else if (status == 1) {           
-    if(dat[i][3]<dat[i][4]){//時間の前後関係が狂ってなければ
-      var dateArray = setSFDate(dat[i][2],dat[i][3],dat[i][4]);//開始時間と終了時間を配列に取得
-      var evt = 　EventCal.createEvent(dat[i][1],dateArray[0],dateArray[1],{location:dat[i][5],description:dat[i][6]});
-      dat[i][7]=evt.getId(); //イベントIDを入力 
-    }else{
+  } else if (status == 1) {
+    if(dat[i][3] && dat[i][4]){//開始時間と終了時間が入力されているならば
+      if(dat[i][3]<dat[i][4]){//時間の前後関係が狂ってなければ
+        var dateArray = setSFDate(dat[i][2],dat[i][3],dat[i][4]);//開始時間と終了時間を配列に取得
+        var evt = 　EventCal.createEvent(dat[i][1],dateArray[0],dateArray[1],{location:dat[i][5],description:dat[i][6]});
+        dat[i][7]=evt.getId(); //イベントIDを入力 
+      }else{
+        dat[i][7]="checked";
+      }
+    } else　{
       dat[i][7]="checked";
     }
   }
-  
   if(past_j) announceChange(dat,i,past_j,status);
   return dat;  
 }

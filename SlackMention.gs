@@ -59,10 +59,7 @@ function genAbsentMessage(dat,i) {
 }
 
 function genAttendanceChanegeMessage(dat,i,j){
-  var message = (dat[j][1] + "さんが"+ 
-                 dat[j][2].getMonth() + "月" + 
-    dat[j][2].getDate() + "日の予定を『"+dat[j][3]+"』から『"+dat[i][3]+"』に変更しました");
-  
+  var message = (dat[j][1] + "さんが" + formDate(new Date(dat[j][2])) + "の予定を『" + dat[j][3] + "』から『" + dat[i][3] + "』に変更しました");
   return message;
 }
 
@@ -70,8 +67,7 @@ function genPracticeChangeMessage(dat,i,j){
   var addmessage = "";      
   if(dat[i][4] == "") addmessage = "なしに";
   
-  var message = (dat[j][2].getMonth() + "月"
-                 + dat[j][2].getDate() + "日の予定を" + addmessage + "変更しました。確認をお願いします！");
+  var message = (formDate(new Date(dat[j][2])) + "の予定を" + addmessage + "変更しました。確認をお願いします！");
   return message;
 }
 
