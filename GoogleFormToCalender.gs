@@ -5,7 +5,7 @@
 statusは定数
 0→出席変更
 1→稽古予定変更
-id_columnはシートでイベントIDが記入される行、配列で使うので7(PracticeSheet)か9(AnswerSheet)
+id_columnはシートでイベントIDが記入される列、配列で使うので7(PracticeSheet)か9(AnswerSheet)
 */
 function checkDuplicationAndAddEvent(dat,i,status){      
   var past_j;//過去に入力された予定の行を保持して、announceChangeに渡すための変数
