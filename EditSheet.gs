@@ -27,5 +27,5 @@ function saveCalenderToSheet(name) {
     if(!dat[i][9])dat[i][9]="nothing";
     i++;
   }
-  sheet.getRange(1, 1, i, 10).setValues(dat);
+  if(dat)sheet.getRange(1, 1, i, 10).setValues(dat);
 }
